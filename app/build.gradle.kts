@@ -4,6 +4,9 @@ plugins {
 
     // Apply compose compiler module wise when working with Kotlin 2.0
     alias(libs.plugins.compose.compiler)
+
+    // Add ksp to project
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
 }
 
 android {
@@ -104,4 +107,18 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    ksp("androidx.room:room-compiler:2.1.6")
+
+    // Eclipse Paho MQTT
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+
+    // MQTT Android Client
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("com.github.hannesa2:paho.mqtt.android:4.0.0")
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0")
+    implementation("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
+
 }
