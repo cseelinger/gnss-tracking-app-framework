@@ -8,6 +8,10 @@ pluginManagement {
             }
         }
         mavenCentral()
+        // Add paho for MQTT
+        maven {
+            url = uri("https://repo.eclipse.org/content/repositories/paho-snapshots/")
+        }
         gradlePluginPortal()
     }
 }
@@ -16,6 +20,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Add paho for MQTT
+        maven {
+            url = uri("https://repo.eclipse.org/content/repositories/paho-snapshots/")
+        }
     }
 }
 
