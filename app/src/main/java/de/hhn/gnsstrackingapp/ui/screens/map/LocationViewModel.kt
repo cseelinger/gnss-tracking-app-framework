@@ -15,9 +15,13 @@ data class LocationData(
 )
 
 class LocationViewModel : ViewModel() {
+
+    private val point1 = LocationData(GeoPoint(49.0, 9.0), "Point 1", 0.0f, "Dead Person")
+    private val point2 = LocationData(GeoPoint(48.9, 8.9), "Point 2", 0.0f, "")
+    private val point3 = LocationData(GeoPoint(48.8, 8.8), "Point 3", 0.0f, "Injured Person")
     private val _locationData = MutableStateFlow(LocationData())
     val locationData: StateFlow<LocationData> = _locationData
-    private val locations = mutableListOf<LocationData>()
+    private val locations = mutableListOf(point1, point2, point3)
 
     fun updateLocation(location: GeoPoint, locationName: String, accuracy: Float) {
         viewModelScope.launch {

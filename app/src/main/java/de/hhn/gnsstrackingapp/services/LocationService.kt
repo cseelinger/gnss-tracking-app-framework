@@ -24,7 +24,6 @@ import java.util.Locale
 class LocationService : Service() {
     companion object {
         var onLocationUpdate: ((Double, Double, String, Float) -> Unit)? = null
-        var onLocationUpdateList: ((Double, Double, String, Float, String) -> Unit)? = null
     }
 
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)

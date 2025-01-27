@@ -5,13 +5,16 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
@@ -19,6 +22,7 @@ import de.hhn.gnsstrackingapp.services.LocationService
 import de.hhn.gnsstrackingapp.services.ServiceManager
 import de.hhn.gnsstrackingapp.ui.navigation.MainNavigation
 import de.hhn.gnsstrackingapp.ui.navigation.NavigationBarComponent
+import de.hhn.gnsstrackingapp.ui.painting.FloatingToolbar
 import de.hhn.gnsstrackingapp.ui.screens.map.LocationViewModel
 import de.hhn.gnsstrackingapp.ui.screens.map.MapViewModel
 import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
@@ -38,6 +42,10 @@ class MainActivity : ComponentActivity() {
     private val locationViewModel: LocationViewModel by viewModel()
     private val settingsViewModel: SettingsViewModel by viewModel()
     private val statisticsViewModel: StatisticsViewModel by viewModel()
+
+    private var x: Int = 0
+    private var y: Int = 0
+    private var z: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,10 +70,6 @@ class MainActivity : ComponentActivity() {
 
         LocationService.onLocationUpdate = { latitude, longitude, locationName, accuracy ->
             locationViewModel.updateLocation(GeoPoint(latitude, longitude), locationName, accuracy)
-        }
-
-        LocationService.onLocationUpdateList = { latitude, longitude, locationName, accuracy, message ->
-            locationViewModel.addLocation(GeoPoint(latitude, longitude), locationName, accuracy, message)
         }
 
         val webServicesProvider = WebServicesProvider("ws://${webSocketIp.value}:80")
@@ -99,8 +103,30 @@ class MainActivity : ComponentActivity() {
                                 settingsViewModel,
                                 webServicesProvider
                             )
+                            navHostController.navigate("map")
                         }
                     })
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        FloatingToolbar(
+                            onCircleClick = {
+                                if(x % 2 == 0) {
+                                    mapViewModel.enableDrawMode()
+                                    mapViewModel.enableDrawCircleMode()
+                                    y = 0
+                                    z = 0
+                                    x++
+                                } else {
+                                    mapViewModel.disableDrawMode()
+                                    mapViewModel.disableDrawCircleMode()
+                                    x = 0
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -113,3 +139,4 @@ class MainActivity : ComponentActivity() {
         webServicesProvider.stopSocket()
     }
 }
+
