@@ -28,6 +28,13 @@ import de.hhn.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.osmdroid.util.GeoPoint
+// new imports
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.views.MapView
+import androidx.compose.runtime.collectAsState
+import org.osmdroid.views.overlay.Marker
+import de.hhn.gnsstrackingapp.ui.screens.map.LocationData
+import androidx.core.content.ContextCompat
 
 
 class MainActivity : ComponentActivity() {
@@ -41,6 +48,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // add more points of locations to the list
+        addPredefinedLocations()
 
         serviceManager = ServiceManager(this)
 
@@ -79,10 +89,34 @@ class MainActivity : ComponentActivity() {
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
+                // location data
+                val locationData = locationViewModel.locationData.collectAsState().value
 
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
+                    Column {
+                        // Add the markers
+                        AndroidView(
+                            factory = { context ->
+                                MapView(context).apply {
+                                    setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
+                                    setMultiTouchControls(true)
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        ) { mapView ->
+                            // Add predefined locations to map
+                            locationViewModel.getAllLocations().forEach { location ->
+                                addMarkerToMap(mapView, location, isCurrentLocation = false)
+                            }
+
+                            // If locationData changes, add new marker for current location
+                            locationData?.let { data ->
+                                addMarkerToMap(mapView, data, isCurrentLocation = true)
+                            }
+                        }
+                    }
                     Scaffold(bottomBar = {
                         NavigationBarComponent(navHostController)
                     }, content = { padding ->
@@ -108,4 +142,41 @@ class MainActivity : ComponentActivity() {
         serviceManager.stopLocationService()
         webServicesProvider.stopSocket()
     }
+
+    // method to add markers to map
+    private fun addMarkerToMap(mapView: MapView, location: LocationData, isCurrentLocation: Boolean) {
+        val marker = Marker(mapView).apply {
+            position = location.location
+            title = location.locationName
+            snippet = location.message
+
+            // Ein anderes Icon für den aktuellen Standort oder das Standard-Icon für andere Standorte
+            val iconResource = if (isCurrentLocation) {
+                android.R.drawable.star_on // Beispiel für aktuelles Standort-Icon
+            } else {
+                android.R.drawable.ic_menu_mapmode // Beispiel für andere Locations
+            }
+            icon = ContextCompat.getDrawable(this@MainActivity, iconResource)
+        }
+
+        mapView.overlays.add(marker)
+        mapView.invalidate()  // Karte neu zeichnen, um den Marker anzuzeigen
+    }
+
+    // method to define two more locations
+    private fun addPredefinedLocations() {
+        locationViewModel.addLocation(
+            GeoPoint(48.9, 8.9),
+            "Point 2",
+            0.0f,
+            ""
+        )
+        locationViewModel.addLocation(
+            GeoPoint(48.8, 8.8),
+            "Point 3",
+            0.0f,
+            "Injured Person"
+        )
+    }
+
 }
