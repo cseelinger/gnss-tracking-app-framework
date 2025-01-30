@@ -48,7 +48,11 @@ fun MapScreen(
             locationViewModel = locationViewModel,
         )
 
-        LocationCard(locationData = locationData)
+        // Wähle hier das erste Element aus der Liste (falls es Elemente gibt)
+        val firstLocation = locationData.firstOrNull()
+        if (firstLocation != null) {
+            LocationCard(locationData = firstLocation)
+        }
 
         Row(
             horizontalArrangement = Arrangement.End,
@@ -56,25 +60,27 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             GetOwnLocationButton(onClick = {
-                val targetLocation = locationViewModel.locationData.value.location
-                val distance = calculateDistance(
-                    mapViewModel.centerLocation.latitude,
-                    mapViewModel.centerLocation.longitude,
-                    targetLocation.latitude,
-                    targetLocation.longitude
-                )
-                val animationDuration = calculateAnimationDuration(
-                    distance, mapViewModel.zoomLevel
-                )
+                val targetLocation = locationViewModel.locationData.value.firstOrNull()?.location
+                if (targetLocation != null) {
+                    val distance = calculateDistance(
+                        mapViewModel.centerLocation.latitude,
+                        mapViewModel.centerLocation.longitude,
+                        targetLocation.latitude,
+                        targetLocation.longitude
+                    )
+                    val animationDuration = calculateAnimationDuration(
+                        distance, mapViewModel.zoomLevel
+                    )
 
-                mapViewModel.centerLocation = targetLocation
-                mapViewModel.zoomLevel = 20.0
+                    mapViewModel.centerLocation = targetLocation
+                    mapViewModel.zoomLevel = 20.0
 
-                mapViewModel.isAnimating.value = true
-                mapView.controller.animateTo(
-                    mapViewModel.centerLocation, mapViewModel.zoomLevel, animationDuration, 0f
-                )
-                mapViewModel.isAnimating.value = false
+                    mapViewModel.isAnimating.value = true
+                    mapView.controller.animateTo(
+                        mapViewModel.centerLocation, mapViewModel.zoomLevel, animationDuration, 0f
+                    )
+                    mapViewModel.isAnimating.value = false
+                }
             })
         }
     }

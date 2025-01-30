@@ -32,6 +32,7 @@ fun OsmMapView(
     onCircleClick: () -> Unit = {}
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
+    val firstLocation = locationData.firstOrNull()
 
     DisposableEffect(mapView) {
         initializeMapView(mapView, mapViewModel)
@@ -67,7 +68,9 @@ fun OsmMapView(
                     addMapListener(mapListener)
                 }
 
-                updateMapViewState(mapView, mapViewModel, locationData, onCircleClick)
+                if (locationData.isNotEmpty()) {
+                    updateMapViewState(mapView, mapViewModel, locationData, onCircleClick)
+                }
 
                 invalidate()
             }
@@ -136,7 +139,7 @@ private fun initializeMapView(
 private fun updateMapViewState(
     mapView: MapView,
     mapViewModel: MapViewModel,
-    locationData: LocationData,
+    locationData: List<LocationData>,
     onCircleClick: () -> Unit
 ) {
     mapView.mapOrientation = mapViewModel.mapOrientation
@@ -144,16 +147,17 @@ private fun updateMapViewState(
 
     mapView.overlays.removeIf { it is CircleOverlay }
 
-    val circleOverlay = CircleOverlay(
-        locationData.location, 0.03f, locationData.accuracy, onCircleClick
-    )
-    mapView.overlays.add(circleOverlay)
+    locationData.forEach { location ->
+        val circleOverlay = CircleOverlay(
+            location.location, 0.03f, location.accuracy, onCircleClick
+        )
+        mapView.overlays.add(circleOverlay)
+    }
 
-    if (mapViewModel.isAnimating.value && mapViewModel.centerLocation != locationData.location) {
-        mapViewModel.centerLocation = locationData.location
-
+    if (locationData.isNotEmpty() && mapViewModel.isAnimating.value &&
+        mapViewModel.centerLocation != locationData.first().location) {
+        mapViewModel.centerLocation = locationData.first().location
         mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
-
         mapViewModel.isAnimating.value = false
     }
 }

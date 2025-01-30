@@ -49,9 +49,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // add more points of locations to the list
-        addPredefinedLocations()
-
         serviceManager = ServiceManager(this)
 
         val requestPermissionLauncher =
@@ -89,8 +86,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
-                // location data
-                val locationData = locationViewModel.locationData.collectAsState().value
 
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
@@ -108,12 +103,7 @@ class MainActivity : ComponentActivity() {
                         ) { mapView ->
                             // Add predefined locations to map
                             locationViewModel.getAllLocations().forEach { location ->
-                                addMarkerToMap(mapView, location, isCurrentLocation = false)
-                            }
-
-                            // If locationData changes, add new marker for current location
-                            locationData?.let { data ->
-                                addMarkerToMap(mapView, data, isCurrentLocation = true)
+                                addMarkerToMap(mapView, location)
                             }
                         }
                     }
@@ -144,39 +134,16 @@ class MainActivity : ComponentActivity() {
     }
 
     // method to add markers to map
-    private fun addMarkerToMap(mapView: MapView, location: LocationData, isCurrentLocation: Boolean) {
+    private fun addMarkerToMap(mapView: MapView, location: LocationData) {
         val marker = Marker(mapView).apply {
             position = location.location
             title = location.locationName
-            snippet = location.message
 
-            // another icon for the recent location or the standard icon for other locations
-            val iconResource = if (isCurrentLocation) {
-                android.R.drawable.star_on
-            } else {
-                android.R.drawable.ic_menu_mapmode
-            }
-            icon = ContextCompat.getDrawable(this@MainActivity, iconResource)
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.star_on)
         }
 
         mapView.overlays.add(marker)
         mapView.invalidate()
-    }
-
-    // method to define two more locations
-    private fun addPredefinedLocations() {
-        locationViewModel.addLocation(
-            GeoPoint(48.9, 8.9),
-            "Point 2",
-            0.0f,
-            ""
-        )
-        locationViewModel.addLocation(
-            GeoPoint(48.8, 8.8),
-            "Point 3",
-            0.0f,
-            "Injured Person"
-        )
     }
 
 }

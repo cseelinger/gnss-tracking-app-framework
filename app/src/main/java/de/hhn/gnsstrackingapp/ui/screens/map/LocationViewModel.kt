@@ -7,40 +7,39 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
+import android.util.Log
+
 data class LocationData(
     val location: GeoPoint = GeoPoint(49.122666, 9.209987),
     val locationName: String = "Heilbronn",
-    val accuracy: Float = 0.0f,
-    val message: String = ""
+    val accuracy: Float = 0.0f
 )
 
 class LocationViewModel : ViewModel() {
-    private val _locationData = MutableStateFlow(LocationData())
-    val locationData: StateFlow<LocationData> = _locationData
+    private val _locationData = MutableStateFlow<List<LocationData>>(emptyList())
+    val locationData: StateFlow<List<LocationData>> = _locationData
 
-    // example point to create
-    private val point1 = LocationData(GeoPoint(49.0, 9.0), "Point 1", 0.0f, "Dead Person")
-    // list of locations
-    private val locations = mutableListOf(point1)
-
-    fun updateLocation(location: GeoPoint, locationName: String, accuracy: Float) {
-        viewModelScope.launch {
-            _locationData.emit(LocationData(location, locationName, accuracy))
-        }
+    init {
+        updateLocation(GeoPoint(48.755757, 9.190172), "Stuttgart", 0.0f)
+        updateLocation(GeoPoint(48.858222, 2.2945), "Eiffelturm", 0.0f,)
+        updateLocation(GeoPoint(52.516389, 13.377778), "Brandenburger Tor", 0.0f)
     }
 
-    // method to add a new location to the list
-    fun addLocation(location: GeoPoint, locationName: String, accuracy: Float, message: String) {
+    fun updateLocation(location: GeoPoint, locationName: String, accuracy: Float) {
+
         // new LocationData object
-        val newLocation = LocationData(location, locationName, accuracy, message)
+        val newLocation = LocationData(location, locationName, accuracy)
 
         // add the new object to the list
-        locations.add(newLocation)
+        val updatedList = _locationData.value.toMutableList()
+        updatedList.add(newLocation)
+
+        _locationData.value = updatedList
     }
 
     // get all locations from the location list
     fun getAllLocations(): List<LocationData> {
-        println(locations)
-        return locations
+        Log.d("LocationViewModel", "Locations: ${_locationData}")
+        return _locationData.value
     }
 }
