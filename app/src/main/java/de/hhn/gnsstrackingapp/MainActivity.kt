@@ -150,17 +150,17 @@ class MainActivity : ComponentActivity() {
             title = location.locationName
             snippet = location.message
 
-            // Ein anderes Icon für den aktuellen Standort oder das Standard-Icon für andere Standorte
+            // another icon for the recent location or the standard icon for other locations
             val iconResource = if (isCurrentLocation) {
-                android.R.drawable.star_on // Beispiel für aktuelles Standort-Icon
+                android.R.drawable.star_on
             } else {
-                android.R.drawable.ic_menu_mapmode // Beispiel für andere Locations
+                android.R.drawable.ic_menu_mapmode
             }
             icon = ContextCompat.getDrawable(this@MainActivity, iconResource)
         }
 
         mapView.overlays.add(marker)
-        mapView.invalidate()  // Karte neu zeichnen, um den Marker anzuzeigen
+        mapView.invalidate()
     }
 
     // method to define two more locations
