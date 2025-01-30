@@ -31,7 +31,6 @@ import org.osmdroid.util.GeoPoint
 // new imports
 import androidx.compose.ui.viewinterop.AndroidView
 import org.osmdroid.views.MapView
-import androidx.compose.runtime.collectAsState
 import org.osmdroid.views.overlay.Marker
 import de.hhn.gnsstrackingapp.ui.screens.map.LocationData
 import androidx.core.content.ContextCompat

@@ -32,6 +32,8 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+// new imports
+import androidx.compose.runtime.*
 
 @Composable
 fun MapScreen(
@@ -41,17 +43,22 @@ fun MapScreen(
     val mapView = rememberMapViewWithLifecycle()
     val locationData by locationViewModel.locationData.collectAsState()
 
+    // state for the selected location
+    var selectedLocation by remember { mutableStateOf<LocationData?>(null) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         OsmMapView(
             mapView = mapView,
             mapViewModel = mapViewModel,
             locationViewModel = locationViewModel,
+            onCircleClick = { clickedLocation ->
+                selectedLocation = clickedLocation // changed signature
+            }
         )
 
-        // Wähle hier das erste Element aus der Liste (falls es Elemente gibt)
-        val firstLocation = locationData.firstOrNull()
-        if (firstLocation != null) {
-            LocationCard(locationData = firstLocation)
+        // show the LocationCard for the clicked point
+        selectedLocation?.let {
+            LocationCard(locationData = it)
         }
 
         Row(
@@ -80,6 +87,9 @@ fun MapScreen(
                         mapViewModel.centerLocation, mapViewModel.zoomLevel, animationDuration, 0f
                     )
                     mapViewModel.isAnimating.value = false
+
+                    // set the new location as active
+                    selectedLocation = locationData.firstOrNull()
                 }
             })
         }

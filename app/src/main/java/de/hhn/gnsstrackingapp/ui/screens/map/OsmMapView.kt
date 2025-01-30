@@ -29,10 +29,9 @@ fun OsmMapView(
     mapView: MapView,
     mapViewModel: MapViewModel,
     locationViewModel: LocationViewModel,
-    onCircleClick: () -> Unit = {}
+    onCircleClick: (LocationData) -> Unit = {} // changed signature
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
-    val firstLocation = locationData.firstOrNull()
 
     DisposableEffect(mapView) {
         initializeMapView(mapView, mapViewModel)
@@ -140,20 +139,24 @@ private fun updateMapViewState(
     mapView: MapView,
     mapViewModel: MapViewModel,
     locationData: List<LocationData>,
-    onCircleClick: () -> Unit
+    onCircleClick: (LocationData) -> Unit // changed signature
 ) {
     mapView.mapOrientation = mapViewModel.mapOrientation
     mapView.controller.setZoom(mapViewModel.zoomLevel)
 
     mapView.overlays.removeIf { it is CircleOverlay }
 
+    // get the list and print circles for all points
     locationData.forEach { location ->
         val circleOverlay = CircleOverlay(
-            location.location, 0.03f, location.accuracy, onCircleClick
-        )
+            location.location, 0.03f, location.accuracy
+        ) {
+            onCircleClick(location) // a click at the circle saves the location
+        }
         mapView.overlays.add(circleOverlay)
     }
 
+    // set the middle of the card to start
     if (locationData.isNotEmpty() && mapViewModel.isAnimating.value &&
         mapViewModel.centerLocation != locationData.first().location) {
         mapViewModel.centerLocation = locationData.first().location

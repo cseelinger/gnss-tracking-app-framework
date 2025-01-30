@@ -1,12 +1,10 @@
 package de.hhn.gnsstrackingapp.ui.screens.map
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
-
+// new imports
 import android.util.Log
 
 data class LocationData(
@@ -16,13 +14,15 @@ data class LocationData(
 )
 
 class LocationViewModel : ViewModel() {
+    // changed the location data to a list to show all points
     private val _locationData = MutableStateFlow<List<LocationData>>(emptyList())
     val locationData: StateFlow<List<LocationData>> = _locationData
 
+    // add some demo points to show the functionality
     init {
-        updateLocation(GeoPoint(48.755757, 9.190172), "Stuttgart", 0.0f)
-        updateLocation(GeoPoint(48.858222, 2.2945), "Eiffelturm", 0.0f,)
-        updateLocation(GeoPoint(52.516389, 13.377778), "Brandenburger Tor", 0.0f)
+        updateLocation(GeoPoint(48.755757, 9.190172), "Here lies an injured person.She needs help.", 0.0f)
+        updateLocation(GeoPoint(48.858222, 2.2945), "Paris", 0.0f)
+        updateLocation(GeoPoint(52.516389, 13.377778), "Berlin", 0.0f)
     }
 
     fun updateLocation(location: GeoPoint, locationName: String, accuracy: Float) {
@@ -39,7 +39,7 @@ class LocationViewModel : ViewModel() {
 
     // get all locations from the location list
     fun getAllLocations(): List<LocationData> {
-        Log.d("LocationViewModel", "Locations: ${_locationData}")
+        Log.d("LocationViewModel", "Locations: $_locationData")
         return _locationData.value
     }
 }
