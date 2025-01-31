@@ -20,7 +20,7 @@ class LocationViewModel : ViewModel() {
 
     // add some demo points to show the functionality
     init {
-        updateLocation(GeoPoint(48.755757, 9.190172), "Here lies an injured person.She needs help.", 0.0f)
+        updateLocation(GeoPoint(48.755757, 9.190172), "Here lies an injured person. She needs help.", 0.0f)
         updateLocation(GeoPoint(48.858222, 2.2945), "Paris", 0.0f)
         updateLocation(GeoPoint(52.516389, 13.377778), "Berlin", 0.0f)
     }
