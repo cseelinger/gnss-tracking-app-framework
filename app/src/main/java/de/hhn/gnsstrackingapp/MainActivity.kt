@@ -28,12 +28,6 @@ import de.hhn.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.osmdroid.util.GeoPoint
-// new imports
-import androidx.compose.ui.viewinterop.AndroidView
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import de.hhn.gnsstrackingapp.ui.screens.map.LocationData
-import androidx.core.content.ContextCompat
 
 
 class MainActivity : ComponentActivity() {
@@ -89,23 +83,6 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    Column {
-                        // Add the markers
-                        AndroidView(
-                            factory = { context ->
-                                MapView(context).apply {
-                                    setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
-                                    setMultiTouchControls(true)
-                                }
-                            },
-                            modifier = Modifier.fillMaxSize()
-                        ) { mapView ->
-                            // Add predefined locations to map
-                            locationViewModel.getAllLocations().forEach { location ->
-                                addMarkerToMap(mapView, location)
-                            }
-                        }
-                    }
                     Scaffold(bottomBar = {
                         NavigationBarComponent(navHostController)
                     }, content = { padding ->
@@ -131,18 +108,4 @@ class MainActivity : ComponentActivity() {
         serviceManager.stopLocationService()
         webServicesProvider.stopSocket()
     }
-
-    // method to add markers to map
-    private fun addMarkerToMap(mapView: MapView, location: LocationData) {
-        val marker = Marker(mapView).apply {
-            position = location.location
-            title = location.locationName
-
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.star_on)
-        }
-
-        mapView.overlays.add(marker)
-        mapView.invalidate()
-    }
-
 }

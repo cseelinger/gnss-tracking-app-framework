@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.osmdroid.util.GeoPoint
-// new imports
-import android.util.Log
 
 data class LocationData(
     val location: GeoPoint = GeoPoint(49.122666, 9.209987),
@@ -35,11 +33,5 @@ class LocationViewModel : ViewModel() {
         updatedList.add(newLocation)
 
         _locationData.value = updatedList
-    }
-
-    // get all locations from the location list
-    fun getAllLocations(): List<LocationData> {
-        Log.d("LocationViewModel", "Locations: $_locationData")
-        return _locationData.value
     }
 }
